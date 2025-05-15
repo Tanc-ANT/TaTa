@@ -475,33 +475,44 @@ Definitions:  {
 
 		private void BuildVerticesSub(StringBuilder builder,int unmergeCount,int vertexCount)
 		{
-			string positionString = "";
+            StringBuilder positionStringBuilder = new StringBuilder();
+
 			for(int i = 0; i < vertexCount; i++)
 			{
-				if (i != 0)
-					positionString += ",";
-				var vertData = indexDataList[i];
-				positionString += vertData.posX + "," + vertData.posY + "," + vertData.posZ;
+                if (i != 0)
+                    positionStringBuilder.Append(",");
+                var vertData = indexDataList[i];
+                positionStringBuilder.Append(vertData.posX).Append(",")
+                                     .Append(vertData.posY).Append(",")
+                                     .Append(vertData.posZ);
 			}
-			string vertexString = $"        Vertices: *{vertexCount * 3} " + "{\r\n" +
+            string positionString = positionStringBuilder.ToString();
+
+
+            string vertexString = $"        Vertices: *{vertexCount * 3} " + "{\r\n" +
 				"        a: " + positionString + "\r\n" +
 				"        }";
 
 			builder.Append(vertexString);
 			builder.AppendLine(string.Empty);
 
-			string polygonString = "";
-			for (int i = 0; i < unmergeCount; i+=3)
-			{
-				if (i != 0)
-					polygonString += ",";
-				var vertData1 = _indexPair[unmergedPolygons[i]];
-				var vertData2 = _indexPair[unmergedPolygons[i+1]] ;
-				var vertData3 = _indexPair[unmergedPolygons[i+2]] ;
-				// unity to maya index order form 0-1-2 to 0-2-1
-				vertData3 = -vertData3 - 1;
-				polygonString += vertData1 + "," + vertData2 + "," + vertData3;
-			}
+            StringBuilder polygonStringBuilder = new StringBuilder();
+            for (int i = 0; i < unmergeCount; i += 3)
+            {
+                if (i != 0)
+                    polygonStringBuilder.Append(",");
+                var vertData1 = _indexPair[unmergedPolygons[i]];
+                var vertData2 = _indexPair[unmergedPolygons[i + 1]];
+                var vertData3 = _indexPair[unmergedPolygons[i + 2]];
+                // unity to maya index order form 0-1-2 to 0-2-1
+                vertData3 = -vertData3 - 1;
+                polygonStringBuilder.Append(vertData1).Append(",")
+                                    .Append(vertData2).Append(",")
+                                    .Append(vertData3);
+            }
+
+            string polygonString = polygonStringBuilder.ToString();
+
 			string polygonVertexString = $"        PolygonVertexIndex: *{unmergeCount} " + "{\r\n" +
 				"        a: " + polygonString + "\r\n" +
 				"        }";
@@ -523,31 +534,37 @@ Definitions:  {
 			builder.Append(normalTitle);
 			builder.AppendLine(string.Empty);
 
-			string noramlString = "";
-			for (int i = 0; i < unmergeCount; i++)
-			{
-				if (i != 0)
-					noramlString += ",";
-				int index = _indexPair[unmergedPolygons[i]];
-				var vertData = indexDataList[index];
-				noramlString += vertData.normalX + "," + vertData.normalY + "," + vertData.normalZ;
-			}
-			string vertexNormalString = $"        Normals: *{unmergeCount * 3} " + "{\r\n" +
-				"        a: " + noramlString + "\r\n" +
+            StringBuilder normalStringBuilder = new StringBuilder();
+            for (int i = 0; i < unmergeCount; i++)
+            {
+                if (i != 0)
+                    normalStringBuilder.Append(",");
+                int index = _indexPair[unmergedPolygons[i]];
+                var vertData = indexDataList[index];
+                normalStringBuilder.Append(vertData.normalX).Append(",")
+                                   .Append(vertData.normalY).Append(",")
+                                   .Append(vertData.normalZ);
+            }
+
+            string normalString = normalStringBuilder.ToString();
+            string vertexNormalString = $"        Normals: *{unmergeCount * 3} " + "{\r\n" +
+				"        a: " + normalString + "\r\n" +
 				"        }";
 
 			builder.Append(vertexNormalString);
 			builder.AppendLine(string.Empty);
 
-			string tempNW = "";
-			for(int i = 0; i< unmergeCount; i++)
-			{
-				if (i != 0)
-					tempNW += ",";
-				tempNW += "1";
-			}
+            StringBuilder tempNWBuilder = new StringBuilder();
+            for (int i = 0; i < unmergeCount; i++)
+            {
+                if (i != 0)
+                    tempNWBuilder.Append(",");
+                tempNWBuilder.Append("1");
+            }
 
-			string normalW = "            NormalsW: *" + unmergeCount + " {\r\n" + 
+            string tempNW = tempNWBuilder.ToString();
+
+            string normalW = "            NormalsW: *" + unmergeCount + " {\r\n" + 
 				"                a: "+ tempNW + "\r\n" +
 				"            }";
 
@@ -576,29 +593,38 @@ Definitions:  {
 			ReferenceInformationType: ""IndexToDirect""";
 			vcTitle += "\r\n";
 
-			string colorString = "";
-			for (int i = 0; i < unmergeCount; i++)
-			{
-				if (i != 0)
-					colorString += ",";
-				var vertData = indexDataList[_indexPair[unmergedPolygons[i]]];
-				colorString += vertData.ColorR + "," + vertData.ColorG + ","+ vertData.ColorB + ","+ vertData.ColorA;
-			}
-			string vertexColorString = $"            Colors: *{unmergeCount *4} " + "{\r\n" +
+            StringBuilder colorStringBuilder = new StringBuilder();
+            for (int i = 0; i < unmergeCount; i++)
+            {
+                if (i != 0)
+                    colorStringBuilder.Append(",");
+                var vertData = indexDataList[_indexPair[unmergedPolygons[i]]];
+                colorStringBuilder.Append(vertData.ColorR).Append(",")
+                                  .Append(vertData.ColorG).Append(",")
+                                  .Append(vertData.ColorB).Append(",")
+                                  .Append(vertData.ColorA);
+            }
+
+            string colorString = colorStringBuilder.ToString();
+
+            string vertexColorString = $"            Colors: *{unmergeCount *4} " + "{\r\n" +
 				"                a: " + colorString + "\r\n" +
 				"            }\r\n";
 			vcTitle += vertexColorString;
 
 
-			string polygonString = "";
-			for (int i = 0; i < unmergeCount; i++)
-			{
-				if (i != 0)
-					polygonString += ",";
-				var vertData = _indexPair[unmergedPolygons[i]] ;
-				polygonString += vertData;
-			}
-			string polygonVertexString = $"            ColorIndex: *{unmergeCount} " + "{\r\n" +
+            StringBuilder polygonStringBuilder = new StringBuilder();
+            for (int i = 0; i < unmergeCount; i++)
+            {
+                if (i != 0)
+                    polygonStringBuilder.Append(",");
+                var vertData = _indexPair[unmergedPolygons[i]];
+                polygonStringBuilder.Append(vertData);
+            }
+
+            string polygonString = polygonStringBuilder.ToString();
+
+            string polygonVertexString = $"            ColorIndex: *{unmergeCount} " + "{\r\n" +
 				"                a: " + polygonString + "\r\n" +
 				"            }\r\n";
 
@@ -615,45 +641,53 @@ Definitions:  {
 			uvString += "            Name: \"UVSet" + uvSet + "\"\r\n";
 			uvString += "            MappingInformationType: \"ByPolygonVertex\"\r\n";
 			uvString += "            ReferenceInformationType: \"IndexToDirect\"\r\n";
-			string tempUVString = "";
-			for (int i = 0; i < vertexCount; i++)
-			{
-				if (i != 0)
-					tempUVString += ",";
-				var vertData = indexDataList[i];
-				float x_value, y_value;
-				if(uvSet == 0)
-				{
-					x_value = vertData.uvX; y_value = vertData.uvY;
-				}else if( uvSet == 1)
-				{
-					x_value = vertData.uv1X; y_value = vertData.uv1Y;
-				}
-				else if (uvSet == 2)
-				{
-					x_value = vertData.uv2X; y_value = vertData.uv2Y;
-				}
-				else
-				{
-					x_value = vertData.uv3X; y_value = vertData.uv3Y;
-				}
 
-				tempUVString += x_value + "," + y_value;
-			}
-			string vertexUVString = $"            UV: *{vertexCount * 2} " + "{\r\n" +
+            StringBuilder tempUVStringBuilder = new StringBuilder();
+            for (int i = 0; i < vertexCount; i++)
+            {
+                if (i != 0)
+                    tempUVStringBuilder.Append(",");
+                var vertData = indexDataList[i];
+                float x_value, y_value;
+                if (uvSet == 0)
+                {
+                    x_value = vertData.uvX; y_value = vertData.uvY;
+                }
+                else if (uvSet == 1)
+                {
+                    x_value = vertData.uv1X; y_value = vertData.uv1Y;
+                }
+                else if (uvSet == 2)
+                {
+                    x_value = vertData.uv2X; y_value = vertData.uv2Y;
+                }
+                else
+                {
+                    x_value = vertData.uv3X; y_value = vertData.uv3Y;
+                }
+
+                tempUVStringBuilder.Append(x_value).Append(",").Append(y_value);
+            }
+
+            string tempUVString = tempUVStringBuilder.ToString();
+
+            string vertexUVString = $"            UV: *{vertexCount * 2} " + "{\r\n" +
 				"                a: " + tempUVString + "\r\n" +
 				"            }\r\n";
 			uvString += vertexUVString;
 
-			string polygonString = "";
-			for (int i = 0; i < unmergeCount; i++)
-			{
-				if (i != 0)
-					polygonString += ",";
-				var vertData = _indexPair[unmergedPolygons[i]];
-				polygonString += vertData;
-			}
-			string polygonVertexString = $"            UVIndex: *{unmergeCount} " + "{\r\n" +
+            StringBuilder polygonStringBuilder = new StringBuilder();
+            for (int i = 0; i < unmergeCount; i++)
+            {
+                if (i != 0)
+                    polygonStringBuilder.Append(",");
+                var vertData = _indexPair[unmergedPolygons[i]];
+                polygonStringBuilder.Append(vertData);
+            }
+
+            string polygonString = polygonStringBuilder.ToString();
+
+            string polygonVertexString = $"            UVIndex: *{unmergeCount} " + "{\r\n" +
 				"                a: " + polygonString + "\r\n" +
 				"            }";
 
